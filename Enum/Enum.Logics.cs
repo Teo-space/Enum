@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace Enum;
+﻿using System.Collections.Immutable;
 
 
 public abstract partial record Enum<TEnum> where TEnum : Enum<TEnum>
@@ -17,44 +15,38 @@ public abstract partial record Enum<TEnum> where TEnum : Enum<TEnum>
     public static IEnumerable<int> Keys => Collection.Select(x => x.Key);
     public static IEnumerable<string> Values => Collection.Select(x => x.Value);
 
-    /*
-    public static ImmutableDictionary<int, Enum<TEnum>> KeyValue1
-        => ImmutableDictionary.CreateRange(Collection.Select(x => new KeyValuePair<int, Enum<TEnum>>(x.Key, x)));
 
-    public static ImmutableDictionary<string, Enum<TEnum>> ValueKey1
-        => ImmutableDictionary.CreateRange(Collection.Select(x => new KeyValuePair<string, Enum<TEnum>>(x.Value, x)));
-    */
+    public static ImmutableDictionary<int, TEnum> KeyValue
+        => ImmutableDictionary.CreateRange(Collection.Select(x => new KeyValuePair<int, TEnum>(x.Key, x)));
 
-    public static ConcurrentDictionary<int, Enum<TEnum>> KeyValue
-        => new ConcurrentDictionary<int, Enum<TEnum>>(Collection.Select(x => new KeyValuePair<int, Enum<TEnum>>(x.Key, x)));
+    public static ImmutableDictionary<string, TEnum> ValueKey
+        => ImmutableDictionary.CreateRange(Collection.Select(x => new KeyValuePair<string, TEnum>(x.Value, x)));
 
-    public static ConcurrentDictionary<string, Enum<TEnum>> ValueKey
-        => new ConcurrentDictionary<string, Enum<TEnum>>(Collection.Select(x => new KeyValuePair<string, Enum<TEnum>>(x.Value, x)));
-
-    public static Enum<TEnum>? FromKey<T>(int key) where T : Enum<T>
+    public static TEnum? FromKey<T>(int key) where T : Enum<T>
     {
         return KeyValue.GetValueOrDefault(key);
     }
 
-    public static Enum<TEnum>? FromValue<T>(string value) where T : Enum<T>
+    public static TEnum? FromValue<T>(string value) where T : Enum<T>
     {
         return ValueKey.GetValueOrDefault(value);
     }
 
-    public static bool TryGetValue(int key, out Enum<TEnum>? result)
+    public static bool TryGetValue(int key, out TEnum? result)
     {
-        var status = KeyValue.TryGetValue(key, out Enum<TEnum>? temp);
+        var status = KeyValue.TryGetValue(key, out TEnum? temp);
         result = temp;
         return status;
     }
 
-    public static bool TryGetValue(string value, out Enum<TEnum>? result)
+    public static bool TryGetValue(string value, out TEnum? result)
     {
-        var status = ValueKey.TryGetValue(value, out Enum<TEnum>? temp);
+        var status = ValueKey.TryGetValue(value, out TEnum? temp);
         result = temp;
         return status;
     }
 
 }
+
 
 //ImmutableSortedSet.CreateRange(Comparer<Test>.Create((x, y) => x.Key > y.Key ? 1 : x.Key < y.Key ? - 1 : 0), Test.Collection);
